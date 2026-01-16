@@ -1,0 +1,20 @@
+name: 'Setup Ona CLI'
+description: 'Download and configure the Ona CLI for use in GitHub Actions workflows'
+author: 'Ona'
+
+branding:
+  icon: 'terminal'
+  color: 'orange'
+
+inputs:
+  channel:
+    description: 'Release channel: "stable" or "latest"'
+    required: false
+    default: 'stable'
+  token:
+    description: 'Ona access token for authentication'
+    required: false
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

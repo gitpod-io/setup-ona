@@ -1,0 +1,25 @@
+{
+  "name": "setup-ona",
+  "version": "1.0.0",
+  "description": "GitHub Action to download and configure the Ona CLI",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "ncc build src/index.js -o dist",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "github-action",
+    "ona",
+    "cli"
+  ],
+  "author": "Ona",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/exec": "^1.1.1",
+    "@actions/tool-cache": "^2.0.1"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.1"
+  }
+}
