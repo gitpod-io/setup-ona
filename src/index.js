@@ -3,10 +3,11 @@ const tc = require('@actions/tool-cache');
 const exec = require('@actions/exec');
 const os = require('os');
 const path = require('path');
+const https = require('https');
 
 const CHANNEL_URLS = {
-  stable: 'https://gitpod.io/static/bin',
-  latest: 'https://gitpod.io/static/bin/latest'
+  stable: 'https://releases.gitpod.io/cli/stable',
+  latest: 'https://releases.gitpod.io/cli/latest'
 };
 
 function getDownloadURL(channel) {
@@ -46,9 +47,53 @@ function getDownloadURL(channel) {
   const baseUrl = CHANNEL_URLS[channel] || CHANNEL_URLS.stable;
 
   return {
-    url: `${baseUrl}/gitpod-cli-${osName}-${archName}${extension}`,
+    url: `${baseUrl}/gitpod-${osName}-${archName}${extension}`,
     extension
   };
+}
+
+/**
+ * Resolves redirects that may return relative paths (e.g., CloudFront).
+ * Returns the final absolute URL after following redirects.
+ */
+async function resolveRedirect(url, maxRedirects = 5) {
+  let currentUrl = url;
+
+  for (let i = 0; i < maxRedirects; i++) {
+    const finalUrl = await new Promise((resolve, reject) => {
+      const req = https.get(currentUrl, (res) => {
+        // Abort the request immediately - we only need headers
+        req.destroy();
+
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          const location = res.headers.location;
+          if (location.startsWith('/')) {
+            // Relative redirect - construct absolute URL
+            const parsed = new URL(currentUrl);
+            resolve(`${parsed.protocol}//${parsed.host}${location}`);
+          } else {
+            resolve(location);
+          }
+        } else {
+          // No redirect, return null to signal we're done
+          resolve(null);
+        }
+      });
+      req.on('error', (err) => {
+        // Ignore abort errors
+        if (err.code !== 'ECONNRESET') {
+          reject(err);
+        }
+      });
+    });
+
+    if (finalUrl === null) {
+      return currentUrl;
+    }
+    currentUrl = finalUrl;
+  }
+
+  throw new Error(`Too many redirects (max ${maxRedirects})`);
 }
 
 async function run() {
@@ -65,8 +110,14 @@ async function run() {
 
     core.info(`Downloading Ona CLI from ${url}`);
 
+    // Resolve redirects that may return relative paths (CloudFront)
+    const resolvedUrl = await resolveRedirect(url);
+    if (resolvedUrl !== url) {
+      core.info(`Resolved to ${resolvedUrl}`);
+    }
+
     // Download the CLI binary
-    const downloadPath = await tc.downloadTool(url);
+    const downloadPath = await tc.downloadTool(resolvedUrl);
 
     // Make it executable (not needed on Windows)
     if (os.platform() !== 'win32') {
