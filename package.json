@@ -4,7 +4,7 @@
   "description": "GitHub Action to download and configure the Ona CLI",
   "main": "dist/index.js",
   "scripts": {
-    "build": "ncc build src/index.js -o dist",
+    "build": "ncc build src/index.js -sm -o dist",
     "test": "echo \"No tests yet\""
   },
   "keywords": [
