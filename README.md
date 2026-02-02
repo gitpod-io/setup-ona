@@ -5,7 +5,7 @@ A GitHub Action that downloads and configures the [Ona CLI](https://www.gitpod.i
 ## Usage
 
 ```yaml
-- uses: ona-io/setup-ona@v1
+- uses: gitpod-io/setup-ona@v1
   with:
     token: ${{ secrets.ONA_TOKEN }}  # optional
 ```
@@ -23,7 +23,7 @@ A GitHub Action that downloads and configures the [Ona CLI](https://www.gitpod.i
 
 ```yaml
 steps:
-  - uses: ona-io/setup-ona@v1
+  - uses: gitpod-io/setup-ona@v1
   - run: gitpod --help
 ```
 
@@ -31,7 +31,7 @@ steps:
 
 ```yaml
 steps:
-  - uses: ona-io/setup-ona@v1
+  - uses: gitpod-io/setup-ona@v1
     with:
       token: ${{ secrets.ONA_TOKEN }}
   - run: gitpod whoami
@@ -42,7 +42,7 @@ steps:
 
 ```yaml
 steps:
-  - uses: ona-io/setup-ona@v1
+  - uses: gitpod-io/setup-ona@v1
     with:
       channel: latest
 ```
@@ -51,7 +51,7 @@ steps:
 
 ```yaml
 steps:
-  - uses: ona-io/setup-ona@v1
+  - uses: gitpod-io/setup-ona@v1
     with:
       token: ${{ secrets.ONA_TOKEN }}
   - run: gitpod environment create https://github.com/${{ github.repository }}
